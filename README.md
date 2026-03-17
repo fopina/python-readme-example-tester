@@ -6,6 +6,8 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/readme-example-tester.svg)](https://pypi.org/project/readme-example-tester/)
 [![Current version on PyPI](https://img.shields.io/pypi/v/readme-example-tester)](https://pypi.org/project/readme-example-tester/)
 
+> **WIP**
+
 Validate fenced Python code blocks in Markdown files, with a small CLI that is handy for README checks in local development and CI.
 
 ## Install
