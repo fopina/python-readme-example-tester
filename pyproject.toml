@@ -3,7 +3,7 @@ requires = ["setuptools>=69.5.0,<80.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "readme-tester"
+name = "readme-example-tester"
 authors = [{name="Filipe Pina", email="shelf-corncob-said@duck.com" }]
 dynamic = ["version"]
 description = "Validate Python code blocks in Markdown README files."
@@ -25,10 +25,10 @@ dev = [
 Homepage = "https://github.com/fopina/python-readme-tester"
 
 [tool.setuptools.packages.find]
-include = ["readme_tester*"]
+include = ["readme_example_tester*"]
 
 [tool.setuptools.dynamic]
-version = {attr = "readme_tester.__version__"}
+version = {attr = "readme_example_tester.__version__"}
 
 [tool.ruff]
 line-length = 120
@@ -63,7 +63,7 @@ testpaths = [
 ]
 
 [tool.coverage.run]
-source = ["readme_tester"]
+source = ["readme_example_tester"]
 
 [tool.coverage.report]
 show_missing = true

@@ -2,9 +2,9 @@
 
 ## Scope
 
-- This repository currently exposes a small public API from `readme_tester`: `ReadmeTestCase` and `ReadmeExample`.
-- The main implementation lives in `readme_tester/case.py`.
-- There is no `readme_tester.core` or `readme_tester.__main__` module in this checkout, so tests and changes should target `readme_tester.case` / `readme_tester`.
+- This repository currently exposes a small public API from `readme_example_tester`: `ReadmeTestCase` and `ReadmeExample`.
+- The main implementation lives in `readme_example_tester/case.py`.
+- There is no `readme_example_tester.core` or `readme_example_tester.__main__` module in this checkout, so tests and changes should target `readme_example_tester.case` / `readme_example_tester`.
 
 ## Environment
 

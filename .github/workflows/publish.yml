@@ -70,8 +70,8 @@ jobs:
             INDEX=" -i ${{ inputs.repository }}"
           fi
           cat <<EOF >> ${GITHUB_STEP_SUMMARY}
-          \`readme-tester\` uploaded to ${{ inputs.repository }}
+          \`readme-example-tester\` uploaded to ${{ inputs.repository }}
           \`\`\`
-          pip install${INDEX} readme-tester==${{ inputs.version }}
+          pip install${INDEX} readme-example-tester==${{ inputs.version }}
           \`\`\`
           EOF

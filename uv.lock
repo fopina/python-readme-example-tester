@@ -884,7 +884,7 @@ wheels = [
 ]
 
 [[package]]
-name = "readme-tester"
+name = "readme-example-tester"
 source = { editable = "." }
 
 [package.dev-dependencies]
