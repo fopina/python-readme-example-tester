@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from readme_tester import ReadmeTestCase
+from readme_example_tester import ReadmeTestCase
 
 
 class ReadmeTestCaseTests(unittest.TestCase):
@@ -90,7 +90,7 @@ class ReadmeTestCaseTests(unittest.TestCase):
 
         self.assertEqual(blocks, {'setup': ['print("setup")'], None: ['print("default")']})
 
-    @mock.patch('readme_tester.case.subprocess.run')
+    @mock.patch('readme_example_tester.case.subprocess.run')
     def test_run_cli_output_strips_shell_prompts(self, run_mock):
         run_mock.return_value = subprocess.CompletedProcess(
             args=['cli.py'],

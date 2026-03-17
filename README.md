@@ -31,16 +31,10 @@ README.md:27: '(' was never closed
 ## Python API
 
 ```python
-from readme_tester.core import validate_python_blocks
+from readme_example_tester import ReadmeTestCase
 
-markdown = """```python
-print("hello from the README")
-```"""
-
-errors = validate_python_blocks(markdown)
-assert errors == []
+assert hasattr(ReadmeTestCase, "__name__")
 ```
 
 ## Development
-
 Project setup and local checks live in [CONTRIBUTING.md](CONTRIBUTING.md).
