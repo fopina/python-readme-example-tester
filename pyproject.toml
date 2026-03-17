@@ -8,7 +8,7 @@ authors = [{name="Filipe Pina", email="shelf-corncob-said@duck.com" }]
 dynamic = ["version"]
 description = "Validate Python code blocks in Markdown README files."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = []
 
 [dependency-groups]
@@ -23,9 +23,6 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/fopina/python-readme-tester"
-
-[project.scripts]
-readme-tester = "readme_tester.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["readme_tester*"]
