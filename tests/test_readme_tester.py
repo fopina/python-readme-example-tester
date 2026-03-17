@@ -1,10 +1,10 @@
-
 from readme_tester.__main__ import main
 from readme_tester.core import extract_fenced_code_blocks, validate_python_blocks
 
 
 def test_extract_fenced_code_blocks_filters_python_blocks():
-    blocks = extract_fenced_code_blocks('# Example\n```python\nprint("hello")\n```\n```bash\necho hello\n```\n')
+    markdown = '# Example\n```python\nprint("hello")\n```\n```bash\necho hello\n```\n'
+    blocks = extract_fenced_code_blocks(markdown)
 
     assert [block.language for block in blocks] == ['python', 'bash']
     assert blocks[0].start_line == 3
