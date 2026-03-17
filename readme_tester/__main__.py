@@ -1,17 +1,33 @@
-import sys
+from __future__ import annotations
 
-from . import demo
+import argparse
+from pathlib import Path
 
-# TODO: only use __main__.py if your package is a CLI tool
+from .core import extract_fenced_code_blocks, validate_markdown_file
 
 
-def main():
-    arg = ' '.join(sys.argv[1:])
-    if not arg:
-        print('Got nothing to say?')
-    else:
-        print(demo.echo(arg))
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description='Validate Python fenced code blocks in a Markdown file.')
+    parser.add_argument('path', nargs='?', default='README.md', help='Markdown file to validate')
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    path = Path(args.path)
+    errors = validate_markdown_file(path)
+    python_blocks = [
+        block for block in extract_fenced_code_blocks(path.read_text()) if block.language in {'python', 'py'}
+    ]
+
+    if errors:
+        for error in errors:
+            print(f'{path}:{error.line}: {error.message}')
+        return 1
+
+    print(f'{path}: validated {len(python_blocks)} Python code block(s)')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
