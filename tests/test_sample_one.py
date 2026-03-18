@@ -9,4 +9,4 @@ class TestSample(unittest.TestCase):
         # in test_some_sample.py
 
         contents = (Path(__file__).parent / 'sample_one.md').read_text()
-        self.assertIn('<!-- example-id: tests/some_sample.py -->', contents)
+        self.assertIn('<!-- example-id: tests/sample_pump_it_up.py -->', contents)
