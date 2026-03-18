@@ -44,7 +44,7 @@ class TestReadme(ReadmeTestCase):
     TESTS_DIR = Path(__file__).parent
 ```
 
-Whever this testcase runs, 3 tests are executed:
+Whenever this testcase runs, 3 tests are executed:
 * `test_readme_example_targets_have_tests`: Ensure every snippet is covered by a test case
   * one subtest per code block
 * `test_readme_code_blocks_match_example_targets`: Ensure every snippet matches an existing file
@@ -64,7 +64,7 @@ And the inner example is in [tests/sample_one.md](tests/sample_one.md) and cover
 > WIP - implemented but documentation pending
 
 * Customize marker: `example-id` is the default but `README_MARKER` allows customizing it
-* Assert snippet *outputs*: use `<!-- example-id-out: tests/some_sample.py someArg -->` when the code block includes the output produced by executing `tests/some_sample.py someArg`
+* Assert snippet *outputs*: use `<!-- example-id-output: tests/some_sample.py someArg -->` when the code block includes the output produced by executing `tests/some_sample.py someArg`
 * Partial snippets: use `README+++`/`README---` in your sample files to highlight the parts that are in the matching code block, instead of the full file - when there's boilerplate required but not meaningful to document
   * Also possible to use same sample file for different code blocks: use `README:<id>+++` in the sample file to delimit and then `<!-- example-id:<id> tests/some_sample.py -->` in the code blocks
   * You can also exclude individual lines by using `# README-EXCLUDE` (in the same line to be excluded)
