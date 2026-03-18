@@ -70,6 +70,32 @@ class ReadmeTestCaseTests(unittest.TestCase):
         self.assertEqual(examples[1].language, 'text')
         self.assertTrue(examples[1].is_output)
 
+    def test_iter_readme_examples_uses_custom_readme_marker(self):
+        self.readme_path.write_text(
+            textwrap.dedent(
+                """\
+                # Examples
+
+                <!-- demo-id: cli.py -->
+                ```python
+                print("hello")
+                ```
+                """
+            ),
+            encoding='utf-8',
+        )
+
+        class CustomMarkerReadmeCase(ReadmeTestCase):
+            README_PATH = self.readme_path
+            TESTS_DIR = self.tests_dir
+            README_MARKER = 'demo-id'
+
+        examples = list(CustomMarkerReadmeCase()._iter_readme_examples())
+
+        self.assertEqual(len(examples), 1)
+        self.assertEqual(examples[0].cli, 'cli.py')
+        self.assertEqual(examples[0].code, 'print("hello")')
+
     def test_readme_blocks_in_cli_file_collects_named_groups(self):
         cli_file = self.tests_dir / 'cli.py'
         cli_file.write_text(

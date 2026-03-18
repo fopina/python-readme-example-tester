@@ -18,12 +18,16 @@ pip install readme-example-tester
 
 Mark the code blocks that you want to test
 
+<!-- actual-example-id: tests/sample_one.md -->
 ````markdown
 Simple snippet using this awesome package:
 
-<!-- example-id: asd -->
+<!-- example-id: tests/some_sample.py -->
 ```python
-print('hello')
+import thislib
+
+def some_method():
+    return thislib.magic_twist('hello')
 ```
 ````
 
@@ -38,8 +42,10 @@ from readme_example_tester import ReadmeTestCase
 class TestReadme(ReadmeTestCase):
     # assuming test is in tests/ and README.md in root
     README_PATH = Path(__file__).parent.parent / 'README.md'
-    TESTS_DIR = Path(__file__).resolve().parent
+    TESTS_DIR = Path(__file__).parent
 ```
+
+**Note**: this example is actually covered in (TBD sample file) and (TBD unit test).
 
 ## Development
 Project setup and local checks live in [CONTRIBUTING.md](CONTRIBUTING.md).

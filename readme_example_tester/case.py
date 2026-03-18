@@ -21,12 +21,14 @@ class ReadmeExample:
 class ReadmeTestCase(unittest.TestCase):
     README_PATH = None
     TESTS_DIR = None
-    EXAMPLE_RE = re.compile(
-        r'(?ms)^[ \t]*<!--\s*(?P<kind>example-id(?:-output)?)\s*:\s*(?P<marker>.+?)\s*-->\s*```(?P<lang>\S*)\s*\n(?P<code>.*?)```'
+    README_MARKER = 'example-id'
+    EXAMPLE_RE_TEMPLATE = (
+        r'(?ms)^[ \t]*<!--\s*(?P<kind>{readme_marker}(?:-output)?)\s*:\s*'
+        r'(?P<marker>.+?)\s*-->\s*```(?P<lang>\S*)\s*\n(?P<code>.*?)```'
     )
-    README_EXCLUDE_RE = re.compile(r'^\s*#\s*README-EXCLUDE\b')
-    README_BLOCK_START_RE = re.compile(r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*\+\+\+\s*$')
-    README_BLOCK_END_RE = re.compile(r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*---\s*$')
+    README_EXCLUDE_RE_TEMPLATE = r'^\s*#\s*README-EXCLUDE\b'
+    README_BLOCK_START_RE_TEMPLATE = r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*\+\+\+\s*$'
+    README_BLOCK_END_RE_TEMPLATE = r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*---\s*$'
 
     # make sure this is not executed by test runner, only subclasses of it
     __test__ = False
@@ -35,6 +37,10 @@ class ReadmeTestCase(unittest.TestCase):
         super().__init_subclass__(**kwargs)
 
         cls.__test__ = True
+        cls.EXAMPLE_RE = re.compile(cls.EXAMPLE_RE_TEMPLATE.format(readme_marker=re.escape(cls.README_MARKER)))
+        cls.README_EXCLUDE_RE = re.compile(cls.README_EXCLUDE_RE_TEMPLATE)
+        cls.README_BLOCK_START_RE = re.compile(cls.README_BLOCK_START_RE_TEMPLATE)
+        cls.README_BLOCK_END_RE = re.compile(cls.README_BLOCK_END_RE_TEMPLATE)
 
         if cls.README_PATH is None:
             raise TypeError(f'{cls.__name__} must define README_PATH')
@@ -64,7 +70,6 @@ class ReadmeTestCase(unittest.TestCase):
         readme_entries = list(self._iter_readme_examples())
         expected_marker_targets = set()
         used_blocks_per_cli: dict[str, dict[Optional[str], int]] = {}
-        self.assertEqual(len(readme_entries), 20)
 
         for example in readme_entries:
             with self.subTest(
@@ -254,11 +259,11 @@ class ReadmeTestCase(unittest.TestCase):
         target_stem = Path(target).with_suffix('').name
         if target_stem.startswith('test_'):
             return None
-        return self.TESTS_DIR / 'clis' / f'test_{target_stem}.py'
+        return self.TESTS_DIR / f'test_{target_stem}.py'
 
     def _normalize_cli_target(self, cli_target: str) -> str:
         normalized = cli_target.strip().removeprefix('tests/')
-        return normalized if normalized.endswith('.py') else f'{normalized}.py'
+        return normalized
 
     def _split_cli_target(self, cli_target: str) -> tuple[str, Optional[str]]:
         cli_file, separator, readme_id = cli_target.partition(':')
