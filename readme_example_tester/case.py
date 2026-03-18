@@ -48,6 +48,7 @@ class ReadmeTestCase(unittest.TestCase):
             raise TypeError(f'{cls.__name__} must define TESTS_DIR')
 
     def test_readme_example_targets_have_clis_tests(self):
+        """Ensure every snippet is covered by a test case"""
         self.maxDiff = None
         seen = set()
 
@@ -66,6 +67,7 @@ class ReadmeTestCase(unittest.TestCase):
                 )
 
     def test_readme_cli_code_blocks_match_tests(self):
+        """Ensure every snippet matches an existing file"""
         self.maxDiff = None
         readme_entries = list(self._iter_readme_examples())
         expected_marker_targets = set()

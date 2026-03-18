@@ -20,19 +20,18 @@ Mark the code blocks that you want to test
 
 <!-- actual-example-id: tests/sample_one.md -->
 ````markdown
-Simple snippet using this awesome package:
+Check out this crazy snippet:
 
 <!-- example-id: tests/some_sample.py -->
 ```python
-import thislib
-
-def some_method():
-    return thislib.magic_twist('hello')
+def pump_it_up(input):
+    return input + 100
 ```
 ````
 
-Then create a unit test for that markdown file, such as:
+Then create a unit test for that README, such as:
 
+<!-- actual-example-id: tests/test_sample_one_readme.py -->
 ```python
 from pathlib import Path
 
@@ -45,7 +44,16 @@ class TestReadme(ReadmeTestCase):
     TESTS_DIR = Path(__file__).parent
 ```
 
-**Note**: this example is actually covered in (TBD sample file) and (TBD unit test).
+Whever this testcase runs, two tests are executed:
+* `test_readme_example_targets_have_clis_tests`: Ensure every snippet is covered by a test case
+* `test_readme_cli_code_blocks_match_tests`: Ensure every snippet matches an existing file
+
+These 2 tests plus the enforce tests on sample files ensures that README always has working code snippets!
+
+#### Dog fooding
+This project README is actually covered by [tests/test_dogfood.py](tests/test_dogfood.py)
+
+And the inner example is in [tests/sample_one.md](tests/sample_one.md) and covered by [tests/test_sample_one_readme.py](tests/test_sample_one_readme.py)
 
 ## Development
 Project setup and local checks live in [CONTRIBUTING.md](CONTRIBUTING.md).
