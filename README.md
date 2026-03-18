@@ -77,7 +77,30 @@ def pump_it_up(input):
 
 #### Assert snippet outputs
 
-<!-- actual-example-id-output: tests/sample_pump_it_up.py -->
+Expanding the previous example to be executable
+<!-- actual-example-id: tests/sample_pump_it_up_cli.py -->
+```python
+#!/usr/bin/env python3
+
+
+def pump_it_up(input):
+    return input + 100
+
+
+def main(argv):
+    if not argv:
+        print('No pump')
+    else:
+        print(pump_it_up(int(argv[0])))
+
+
+if __name__ == '__main__':
+    import sys
+
+    main(sys.argv[1:])
+```
+
+<!-- actual-example-id-output: tests/sample_pump_it_up_cli.py -->
 ```text
 $ tests/test_show_greeting.py
 dogfood
