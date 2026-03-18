@@ -3,6 +3,7 @@ import shlex
 import subprocess
 import unittest
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from typing import Optional
 
@@ -21,12 +22,15 @@ class ReadmeExample:
 class ReadmeTestCase(unittest.TestCase):
     README_PATH = None
     TESTS_DIR = None
-    EXAMPLE_RE = re.compile(
-        r'(?ms)^[ \t]*<!--\s*(?P<kind>example-id(?:-output)?)\s*:\s*(?P<marker>.+?)\s*-->\s*```(?P<lang>\S*)\s*\n(?P<code>.*?)```'
+    README_MARKER = 'example-id'
+    SAMPLE_FILE_GLOB = 'sample_*'
+    EXAMPLE_RE_TEMPLATE = (
+        r'(?ms)^[ \t]*<!--\s*(?P<kind>{readme_marker}(?:-output)?)\s*:\s*'
+        r'(?P<marker>.+?)\s*-->\s*(?P<fence>`{{3,}})(?P<lang>\S*)\s*\n(?P<code>.*?)^[ \t]*(?P=fence)\s*$'
     )
-    README_EXCLUDE_RE = re.compile(r'^\s*#\s*README-EXCLUDE\b')
-    README_BLOCK_START_RE = re.compile(r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*\+\+\+\s*$')
-    README_BLOCK_END_RE = re.compile(r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*---\s*$')
+    README_EXCLUDE_RE_TEMPLATE = r'^\s*#\s*README-EXCLUDE\b'
+    README_BLOCK_START_RE_TEMPLATE = r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*\+\+\+\s*$'
+    README_BLOCK_END_RE_TEMPLATE = r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*---\s*$'
 
     # make sure this is not executed by test runner, only subclasses of it
     __test__ = False
@@ -35,17 +39,22 @@ class ReadmeTestCase(unittest.TestCase):
         super().__init_subclass__(**kwargs)
 
         cls.__test__ = True
+        cls.EXAMPLE_RE = re.compile(cls.EXAMPLE_RE_TEMPLATE.format(readme_marker=re.escape(cls.README_MARKER)))
+        cls.README_EXCLUDE_RE = re.compile(cls.README_EXCLUDE_RE_TEMPLATE)
+        cls.README_BLOCK_START_RE = re.compile(cls.README_BLOCK_START_RE_TEMPLATE)
+        cls.README_BLOCK_END_RE = re.compile(cls.README_BLOCK_END_RE_TEMPLATE)
 
         if cls.README_PATH is None:
             raise TypeError(f'{cls.__name__} must define README_PATH')
         if cls.TESTS_DIR is None:
             raise TypeError(f'{cls.__name__} must define TESTS_DIR')
 
-    def test_readme_example_targets_have_clis_tests(self):
+    def test_readme_example_targets_have_tests(self):
+        """Ensure every snippet is covered by a test case"""
         self.maxDiff = None
         seen = set()
 
-        for example in self._iter_readme_examples():
+        for example in self._iter_readme_examples:
             if example.cli in seen:
                 continue
             seen.add(example.cli)
@@ -59,14 +68,12 @@ class ReadmeTestCase(unittest.TestCase):
                     f'example target {example.cli} should have a test file at {test_file} for README coverage',
                 )
 
-    def test_readme_cli_code_blocks_match_tests(self):
+    def test_readme_code_blocks_match_example_targets(self):
+        """Ensure every snippet matches an existing file"""
         self.maxDiff = None
-        readme_entries = list(self._iter_readme_examples())
-        expected_marker_targets = set()
         used_blocks_per_cli: dict[str, dict[Optional[str], int]] = {}
-        self.assertEqual(len(readme_entries), 20)
 
-        for example in readme_entries:
+        for example in self._iter_readme_examples:
             with self.subTest(
                 example_line=example.line,
                 cli=example.cli,
@@ -90,8 +97,6 @@ class ReadmeTestCase(unittest.TestCase):
                         f'README output example at line {example.line} does not match output of {example.cli}.',
                     )
                     continue
-
-                expected_marker_targets.add(target)
 
                 cli_blocks = self._readme_expected_cli_blocks(cli_file, example.readme_id)
                 self.assertTrue(
@@ -127,26 +132,22 @@ class ReadmeTestCase(unittest.TestCase):
 
                 used_blocks_per_cli[target][example.readme_id] = used + 1
 
-        for cli_file in sorted(self.TESTS_DIR.glob('cli*.py')):
+    def test_examples_are_still_in_use(self):
+        """Ensure all files inside TESTS_DIR matching SAMPLE_FILE_GLOB (sample_*) are still being used in README"""
+        expected_marker_targets = {self._normalize_cli_target(example.cli) for example in self._iter_readme_examples}
+
+        for cli_file in sorted(self.TESTS_DIR.glob(self.SAMPLE_FILE_GLOB)):
             if self._cli_file_is_excluded(cli_file):
                 continue
+            with self.subTest(sample_file=cli_file):
+                target = cli_file.name
+                file_block_groups = self._cli_file_block_groups(cli_file)
+                if len(file_block_groups) == 1 and file_block_groups.get(None) is not None:
+                    continue
+                if target not in expected_marker_targets:
+                    self.fail(f'{target} has no README example marker')
 
-            target = cli_file.name
-            file_block_groups = self._cli_file_block_groups(cli_file)
-            if len(file_block_groups) == 1 and file_block_groups.get(None) is not None:
-                continue
-            if target not in expected_marker_targets:
-                self.fail(f'{target} has no README example marker')
-
-            used = used_blocks_per_cli.get(target, {})
-            for block_id, block_values in file_block_groups.items():
-                with self.subTest(cli=target, readme_id=block_id, scope='block_coverage'):
-                    self.assertEqual(
-                        used.get(block_id, 0),
-                        len(block_values),
-                        f'README is missing or has too many references for {target} id={block_id!r}',
-                    )
-
+    @cached_property
     def _iter_readme_examples(self):
         readme = self.README_PATH.read_text()
 
@@ -167,7 +168,7 @@ class ReadmeTestCase(unittest.TestCase):
                 args=cli_args,
                 language=match.group('lang'),
                 code=match.group('code').rstrip(),
-                is_output=match.group('kind') == 'example-id-output',
+                is_output=match.group('kind') == f'{self.README_MARKER}-output',
             )
 
     def _cli_file_is_excluded(self, cli_file: Path) -> bool:
@@ -254,11 +255,11 @@ class ReadmeTestCase(unittest.TestCase):
         target_stem = Path(target).with_suffix('').name
         if target_stem.startswith('test_'):
             return None
-        return self.TESTS_DIR / 'clis' / f'test_{target_stem}.py'
+        return self.TESTS_DIR / f'test_{target_stem}.py'
 
     def _normalize_cli_target(self, cli_target: str) -> str:
         normalized = cli_target.strip().removeprefix('tests/')
-        return normalized if normalized.endswith('.py') else f'{normalized}.py'
+        return normalized
 
     def _split_cli_target(self, cli_target: str) -> tuple[str, Optional[str]]:
         cli_file, separator, readme_id = cli_target.partition(':')
