@@ -6,9 +6,7 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/readme-example-tester.svg)](https://pypi.org/project/readme-example-tester/)
 [![Current version on PyPI](https://img.shields.io/pypi/v/readme-example-tester)](https://pypi.org/project/readme-example-tester/)
 
-> **WIP**
-
-Validate fenced Python code blocks in Markdown files, with a small CLI that is handy for README checks in local development and CI.
+Do not let your README/documentation examples become invalid: unit test them!
 
 ## Install
 
@@ -18,24 +16,29 @@ pip install readme-example-tester
 
 ## Usage
 
-```bash
-$ readme-example-tester README.md
-README.md: validated 2 Python code block(s)
+Mark the code blocks that you want to test
+
+````markdown
+Simple snippet using this awesome package:
+
+<!-- example-id: asd -->
+```python
+print('hello')
 ```
+````
 
-If a fenced Python block contains invalid syntax, the command exits with a non-zero status and prints the failing line:
-
-```text
-$ readme-example-tester README.md
-README.md:27: '(' was never closed
-```
-
-## Python API
+Then create a unit test for that markdown file, such as:
 
 ```python
+from pathlib import Path
+
 from readme_example_tester import ReadmeTestCase
 
-assert hasattr(ReadmeTestCase, "__name__")
+
+class TestReadme(ReadmeTestCase):
+    # assuming test is in tests/ and README.md in root
+    README_PATH = Path(__file__).parent.parent / 'README.md'
+    TESTS_DIR = Path(__file__).resolve().parent
 ```
 
 ## Development
