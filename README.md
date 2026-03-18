@@ -44,12 +44,15 @@ class TestReadme(ReadmeTestCase):
     TESTS_DIR = Path(__file__).parent
 ```
 
-Whever this testcase runs, two tests are executed:
+Whever this testcase runs, 3 tests are executed:
 * `test_readme_example_targets_have_tests`: Ensure every snippet is covered by a test case
+  * one subtest per code block
 * `test_readme_code_blocks_match_example_targets`: Ensure every snippet matches an existing file
-> Both tests will create one subtest for each code block
+  * one subtest per code block
+* `test_examples_are_still_in_use`: Ensure all files inside TESTS_DIR matching SAMPLE_FILE_GLOB (sample_*) are still being used in README
+  * one subtest per sample file
 
-These 2 tests plus the enforce tests on sample files ensures that README always has working code snippets!
+These 3 tests plus the enforced tests on sample files ensures that README always has working code snippets!
 
 ### Dog fooding
 This project README is actually covered by [tests/test_dogfood.py](tests/test_dogfood.py)
