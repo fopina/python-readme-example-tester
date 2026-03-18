@@ -50,10 +50,19 @@ Whever this testcase runs, two tests are executed:
 
 These 2 tests plus the enforce tests on sample files ensures that README always has working code snippets!
 
-#### Dog fooding
+### Dog fooding
 This project README is actually covered by [tests/test_dogfood.py](tests/test_dogfood.py)
 
 And the inner example is in [tests/sample_one.md](tests/sample_one.md) and covered by [tests/test_sample_one_readme.py](tests/test_sample_one_readme.py)
+
+### More usage options
+
+> WIP - implemented but documentation pending
+
+* Customize marker: `example-id` is the default but `README_MARKER` allows customizing it
+* Assert snippet *outputs*: use `<!-- example-id-out: tests/some_sample.py someArg -->` when the code block includes the output produced by executing `tests/some_sample.py someArg`
+* Partial snippets: use `README+++`/`README---` in your sample files to highlight the parts that are in the matching code block, instead of the full file - when there's boilerplate required but not meaningful to document
+  * Also possible to use same sample file for different code blocks: use `README:<id>+++` in the sample file to delimit and then `<!-- example-id:<id> tests/some_sample.py -->` in the code blocks
 
 ## Development
 Project setup and local checks live in [CONTRIBUTING.md](CONTRIBUTING.md).
