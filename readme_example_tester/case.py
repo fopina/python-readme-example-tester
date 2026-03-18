@@ -168,7 +168,7 @@ class ReadmeTestCase(unittest.TestCase):
                 args=cli_args,
                 language=match.group('lang'),
                 code=match.group('code').rstrip(),
-                is_output=match.group('kind') == 'example-id-output',
+                is_output=match.group('kind') == f'{self.README_MARKER}-output',
             )
 
     def _cli_file_is_excluded(self, cli_file: Path) -> bool:

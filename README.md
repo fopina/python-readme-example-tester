@@ -77,6 +77,9 @@ def pump_it_up(input):
 
 #### Assert snippet outputs
 
+Use `<!-- example-id-output: ... -->` (or `README_MARKER-output` if customized) to compare/validate outputs from an executable sample script.
+
+
 Expanding the previous example to be executable
 <!-- actual-example-id: tests/sample_pump_it_up_cli.py -->
 ```python
@@ -100,15 +103,20 @@ if __name__ == '__main__':
     main(sys.argv[1:])
 ```
 
-<!-- actual-example-id-output: tests/sample_pump_it_up_cli.py -->
+<!-- actual-example-id: tests/sample_two.md -->
+````text
+<!-- example-id-output: tests/sample_pump_it_up_cli.py 2 -->
 ```text
-$ tests/test_show_greeting.py
-dogfood
+$ tests/sample_pump_it_up_cli.py 2
+102
 ```
+````
 
 #### Partial snippets
 
-Use `# README+++` / `# README---` in a sample file to narrow the excerpt that matches the README block when the source file has extra boilerplate. If one sample file feeds multiple README blocks, use `# README:<id>+++` / `# README:<id>---` to split the source into named sections. This README's inner example is backed by [tests/sample_one.md](tests/sample_one.md).
+Use `# README+++` / `# README---` in a sample file to narrow the excerpt that matches the README block when the source file has extra boilerplate.
+
+If one sample file feeds multiple README blocks, use `# README:<id>+++` / `# README:<id>---` to split the source into named sections and then use `<!-- example-id:<id> tests/... -->` in the code snippets
 
 #### Non-sample sample files
 
