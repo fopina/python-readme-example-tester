@@ -70,6 +70,41 @@ class ReadmeTestCaseTests(unittest.TestCase):
         self.assertEqual(examples[1].language, 'text')
         self.assertTrue(examples[1].is_output)
 
+    def test_iter_readme_examples_supports_longer_fences(self):
+        self.readme_path.write_text(
+            textwrap.dedent(
+                """\
+                # Examples
+
+                <!-- example-id: cli.py -->
+                ````markdown
+                before
+                ```python
+                print("nested")
+                ```
+                after
+                ````
+                """
+            ),
+            encoding='utf-8',
+        )
+
+        examples = list(self.make_case()._iter_readme_examples())
+
+        self.assertEqual(len(examples), 1)
+        self.assertEqual(
+            examples[0].code,
+            textwrap.dedent(
+                """\
+                before
+                ```python
+                print("nested")
+                ```
+                after
+                """
+            ).rstrip(),
+        )
+
     def test_iter_readme_examples_uses_custom_readme_marker(self):
         self.readme_path.write_text(
             textwrap.dedent(

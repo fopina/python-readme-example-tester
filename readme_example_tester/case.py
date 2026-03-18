@@ -24,7 +24,7 @@ class ReadmeTestCase(unittest.TestCase):
     README_MARKER = 'example-id'
     EXAMPLE_RE_TEMPLATE = (
         r'(?ms)^[ \t]*<!--\s*(?P<kind>{readme_marker}(?:-output)?)\s*:\s*'
-        r'(?P<marker>.+?)\s*-->\s*```(?P<lang>\S*)\s*\n(?P<code>.*?)```'
+        r'(?P<marker>.+?)\s*-->\s*(?P<fence>`{{3,}})(?P<lang>\S*)\s*\n(?P<code>.*?)^[ \t]*(?P=fence)\s*$'
     )
     README_EXCLUDE_RE_TEMPLATE = r'^\s*#\s*README-EXCLUDE\b'
     README_BLOCK_START_RE_TEMPLATE = r'^\s*#\s*README(?::(?P<block_id>\S+))?\s*\+\+\+\s*$'
