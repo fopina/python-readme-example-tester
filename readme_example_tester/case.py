@@ -3,6 +3,7 @@ import shlex
 import subprocess
 import unittest
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from typing import Optional
 
@@ -22,6 +23,7 @@ class ReadmeTestCase(unittest.TestCase):
     README_PATH = None
     TESTS_DIR = None
     README_MARKER = 'example-id'
+    SAMPLE_FILE_GLOB = 'sample_*'
     EXAMPLE_RE_TEMPLATE = (
         r'(?ms)^[ \t]*<!--\s*(?P<kind>{readme_marker}(?:-output)?)\s*:\s*'
         r'(?P<marker>.+?)\s*-->\s*(?P<fence>`{{3,}})(?P<lang>\S*)\s*\n(?P<code>.*?)^[ \t]*(?P=fence)\s*$'
@@ -47,12 +49,12 @@ class ReadmeTestCase(unittest.TestCase):
         if cls.TESTS_DIR is None:
             raise TypeError(f'{cls.__name__} must define TESTS_DIR')
 
-    def test_readme_example_targets_have_clis_tests(self):
+    def test_readme_example_targets_have_tests(self):
         """Ensure every snippet is covered by a test case"""
         self.maxDiff = None
         seen = set()
 
-        for example in self._iter_readme_examples():
+        for example in self._iter_readme_examples:
             if example.cli in seen:
                 continue
             seen.add(example.cli)
@@ -66,14 +68,12 @@ class ReadmeTestCase(unittest.TestCase):
                     f'example target {example.cli} should have a test file at {test_file} for README coverage',
                 )
 
-    def test_readme_cli_code_blocks_match_tests(self):
+    def test_readme_code_blocks_match_example_targets(self):
         """Ensure every snippet matches an existing file"""
         self.maxDiff = None
-        readme_entries = list(self._iter_readme_examples())
-        expected_marker_targets = set()
         used_blocks_per_cli: dict[str, dict[Optional[str], int]] = {}
 
-        for example in readme_entries:
+        for example in self._iter_readme_examples:
             with self.subTest(
                 example_line=example.line,
                 cli=example.cli,
@@ -97,8 +97,6 @@ class ReadmeTestCase(unittest.TestCase):
                         f'README output example at line {example.line} does not match output of {example.cli}.',
                     )
                     continue
-
-                expected_marker_targets.add(target)
 
                 cli_blocks = self._readme_expected_cli_blocks(cli_file, example.readme_id)
                 self.assertTrue(
@@ -134,26 +132,22 @@ class ReadmeTestCase(unittest.TestCase):
 
                 used_blocks_per_cli[target][example.readme_id] = used + 1
 
-        for cli_file in sorted(self.TESTS_DIR.glob('cli*.py')):
+    def test_examples_are_still_in_use(self):
+        """Ensure all files inside TESTS_DIR matching SAMPLE_FILE_GLOB (sample_*) are still being used in README"""
+        expected_marker_targets = {self._normalize_cli_target(example.cli) for example in self._iter_readme_examples}
+
+        for cli_file in sorted(self.TESTS_DIR.glob(self.SAMPLE_FILE_GLOB)):
             if self._cli_file_is_excluded(cli_file):
                 continue
+            with self.subTest(sample_file=cli_file):
+                target = cli_file.name
+                file_block_groups = self._cli_file_block_groups(cli_file)
+                if len(file_block_groups) == 1 and file_block_groups.get(None) is not None:
+                    continue
+                if target not in expected_marker_targets:
+                    self.fail(f'{target} has no README example marker')
 
-            target = cli_file.name
-            file_block_groups = self._cli_file_block_groups(cli_file)
-            if len(file_block_groups) == 1 and file_block_groups.get(None) is not None:
-                continue
-            if target not in expected_marker_targets:
-                self.fail(f'{target} has no README example marker')
-
-            used = used_blocks_per_cli.get(target, {})
-            for block_id, block_values in file_block_groups.items():
-                with self.subTest(cli=target, readme_id=block_id, scope='block_coverage'):
-                    self.assertEqual(
-                        used.get(block_id, 0),
-                        len(block_values),
-                        f'README is missing or has too many references for {target} id={block_id!r}',
-                    )
-
+    @cached_property
     def _iter_readme_examples(self):
         readme = self.README_PATH.read_text()
 

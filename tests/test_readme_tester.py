@@ -58,7 +58,7 @@ class ReadmeTestCaseTests(unittest.TestCase):
             encoding='utf-8',
         )
 
-        examples = list(self.make_case()._iter_readme_examples())
+        examples = list(self.make_case()._iter_readme_examples)
 
         self.assertEqual(len(examples), 2)
         self.assertEqual(examples[0].cli, 'cli.py')
@@ -89,7 +89,7 @@ class ReadmeTestCaseTests(unittest.TestCase):
             encoding='utf-8',
         )
 
-        examples = list(self.make_case()._iter_readme_examples())
+        examples = list(self.make_case()._iter_readme_examples)
 
         self.assertEqual(len(examples), 1)
         self.assertEqual(
@@ -125,7 +125,7 @@ class ReadmeTestCaseTests(unittest.TestCase):
             TESTS_DIR = self.tests_dir
             README_MARKER = 'demo-id'
 
-        examples = list(CustomMarkerReadmeCase()._iter_readme_examples())
+        examples = list(CustomMarkerReadmeCase()._iter_readme_examples)
 
         self.assertEqual(len(examples), 1)
         self.assertEqual(examples[0].cli, 'cli.py')

@@ -45,8 +45,9 @@ class TestReadme(ReadmeTestCase):
 ```
 
 Whever this testcase runs, two tests are executed:
-* `test_readme_example_targets_have_clis_tests`: Ensure every snippet is covered by a test case
-* `test_readme_cli_code_blocks_match_tests`: Ensure every snippet matches an existing file
+* `test_readme_example_targets_have_tests`: Ensure every snippet is covered by a test case
+* `test_readme_code_blocks_match_example_targets`: Ensure every snippet matches an existing file
+> Both tests will create one subtest for each code block
 
 These 2 tests plus the enforce tests on sample files ensures that README always has working code snippets!
 
@@ -63,6 +64,7 @@ And the inner example is in [tests/sample_one.md](tests/sample_one.md) and cover
 * Assert snippet *outputs*: use `<!-- example-id-out: tests/some_sample.py someArg -->` when the code block includes the output produced by executing `tests/some_sample.py someArg`
 * Partial snippets: use `README+++`/`README---` in your sample files to highlight the parts that are in the matching code block, instead of the full file - when there's boilerplate required but not meaningful to document
   * Also possible to use same sample file for different code blocks: use `README:<id>+++` in the sample file to delimit and then `<!-- example-id:<id> tests/some_sample.py -->` in the code blocks
+  * You can also exclude individual lines by using `# README-EXCLUDE` (in the same line to be excluded)
 
 ## Development
 Project setup and local checks live in [CONTRIBUTING.md](CONTRIBUTING.md).
